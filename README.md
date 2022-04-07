@@ -34,6 +34,8 @@ Coming soon.
 In [playground.py](playground.py) you can test your turing machine scripts, you can modify the initial tape, 
 as well as load different scripts from text files. This is equivalent to using singleplayer in the main program (for now).
 
+![sample](./media/sample_demo.gif)
+
 ## The Language
 
 This program uses a simple scripting language to allow for easy implementation of turing machines, with some extensions.
