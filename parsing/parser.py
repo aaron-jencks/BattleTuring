@@ -5,7 +5,8 @@ from enum import Enum
 from .lexer import Lexer, Lexeme
 from .commands import TuringCommand, EqualsComparison, LessComparison, GreaterComparison, NotEqualsComparison, \
     LessEqualsComparison, GreaterEqualsComparison, NegationComparison, ReadCommand, ValueCommand, MoveCommand, \
-    CommandEnum, WriteCommand, CallCommand, JumpCommand, CondJumpCommand, HaltCommand, DuplicateStackCommand
+    CommandEnum, WriteCommand, CallCommand, JumpCommand, CondJumpCommand, HaltCommand, DuplicateStackCommand, \
+    OrComparison, AndComparison
 from .values import Numeric, Character, Boolean
 
 """
@@ -131,6 +132,10 @@ class BinaryOperatorExpression(ExpressionAST):
             result.append(LessComparison())
         elif self.operator.code == ord('>'):
             result.append(GreaterComparison())
+        elif self.operator.code == ord('|'):
+            result.append(OrComparison())
+        elif self.operator.code == ord('&'):
+            result.append(AndComparison())
         elif self.operator.code == 310:
             result.append(NotEqualsComparison())
         elif self.operator.code == 313:
@@ -383,7 +388,7 @@ class AST:
         self.lexer.add_reset_buffer()
         eme = self.lexer.get_next()
         if eme is not None:
-            if eme.code in list(map(ord, '<>=!')) + [311, 314, 315]:
+            if eme.code in list(map(ord, '<>=!|&')) + [311, 314, 315]:
                 # We found an operator
                 expa = self.parse_expression()
                 if expa is not None:

@@ -124,6 +124,22 @@ class LessEqualsComparison(ComparisonCommand):
         return args[0] <= args[1]
 
 
+class OrComparison(ComparisonCommand):
+    def __init__(self):
+        super().__init__()
+
+    def evaluate(self, args: List[Value]) -> bool:
+        return args[0].value or args[1].value
+
+
+class AndComparison(ComparisonCommand):
+    def __init__(self):
+        super().__init__()
+
+    def evaluate(self, args: List[Value]) -> bool:
+        return args[0].value and args[1].value
+
+
 class NegationComparison(ComparisonCommand):
     def __init__(self):
         super().__init__(1)
