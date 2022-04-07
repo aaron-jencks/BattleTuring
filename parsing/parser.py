@@ -510,6 +510,7 @@ class AST:
         if ident is not None and ident.code == 302:
             colon = self.lexer.get_next()
             if colon is not None and colon.code == ord(':'):
+                self.env[ident.token] = None
                 sb = self.parse_statement_block()
                 if sb is not None:
                     self.lexer.pop_reset_buffer()

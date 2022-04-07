@@ -18,6 +18,8 @@ import sys
 
 pygame.init()
 
+fname = ''
+
 
 def set_text(string, coordx, coordy, fontSize, color: Tuple[int, int, int] = (255, 255, 255)):
     # Function to set text
@@ -91,8 +93,6 @@ def main():
 
     tape = TheTape()
     machine = TuringMachine(tape)
-
-    fname = ''
 
     def initialize_tape(value):
         tape.initialize_tape(value)
