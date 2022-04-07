@@ -130,7 +130,7 @@ while(= read 'a') {
 
 Battle Turing supports most common binary equality operators, `=,<,>,<=,>=,!=`, note that `==` is symbolized as `=` here,
 this is because there is no assignment operator. In addition to this, Battle Turing also supports negation using the 
-`!` unary operator.
+`!` unary operator as well as `&` for logical AND and `|` for logical OR.
 
 Some things to note:
 
