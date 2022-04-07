@@ -17,10 +17,22 @@ python main.py
 python playground.py
 ```
 
+## Main
+
+The main program has two modes, singleplayer, and multiplayer
+
+### Singleplayer
+
+Currently this is a copy of the playground, but will change in the future.
+
+### Multiplayer
+
+Coming soon.
+
 ## Playground
 
 In [playground.py](playground.py) you can test your turing machine scripts, you can modify the initial tape, 
-as well as load different scripts from text files.
+as well as load different scripts from text files. This is equivalent to using singleplayer in the main program (for now).
 
 ## The Language
 
