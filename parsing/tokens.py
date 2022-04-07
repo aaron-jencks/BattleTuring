@@ -196,5 +196,6 @@ keywork_tokens = [
     'goto',
     'left', 'right',
     '!=', '<<', '>>', '<=', '>=',
-    'true', 'false', 'halt'
+    'true', 'false', 'halt',
+    'break', 'continue'
 ]

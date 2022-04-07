@@ -18,6 +18,8 @@ import sys
 
 pygame.init()
 
+fname = ''
+
 
 def set_text(string, coordx, coordy, fontSize, color: Tuple[int, int, int] = (255, 255, 255)):
     # Function to set text
