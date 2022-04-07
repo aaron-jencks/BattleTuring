@@ -5,7 +5,7 @@ from enum import Enum
 from .lexer import Lexer, Lexeme
 from .commands import TuringCommand, EqualsComparison, LessComparison, GreaterComparison, NotEqualsComparison, \
     LessEqualsComparison, GreaterEqualsComparison, NegationComparison, ReadCommand, ValueCommand, MoveCommand, \
-    CommandEnum, WriteCommand, CallCommand, JumpCommand, CondJumpCommand, HaltCommand
+    CommandEnum, WriteCommand, CallCommand, JumpCommand, CondJumpCommand, HaltCommand, DuplicateStackCommand
 from .values import Numeric, Character, Boolean
 
 """
@@ -303,7 +303,7 @@ class ControlFlowStatementAST(StatementAST):
             return expc + [NegationComparison(), CondJumpCommand(len(sbc) + 1)] + sbc + \
                    [JumpCommand(-(len(sbc) + 2 + len(expc)))]
         else:
-            return self.exp.compile(env) + [CondJumpCommand(len(sbc))] + sbc
+            return expc + [NegationComparison(), CondJumpCommand(len(sbc))] + sbc
 
 
 class ElseControlFlowStatementAST(ControlFlowStatementAST):
@@ -317,7 +317,11 @@ class ElseControlFlowStatementAST(ControlFlowStatementAST):
         return [self.contr, self.lp] + self.exp.traverse() + [self.rp] + self.sb.traverse()
 
     def compile(self, env: Environment) -> List[TuringCommand]:
-        return super().compile(env) + self.esb.compile(env)
+        sbc = self.sb.compile(env)
+        expc = self.exp.compile(env)
+        esbc = self.esb.compile(env)
+        return expc + [DuplicateStackCommand(), NegationComparison(), CondJumpCommand(len(sbc))] + sbc + \
+               [CondJumpCommand(len(esbc))] + esbc
 
 
 class FunctionDefinitionAST(ASTNode):

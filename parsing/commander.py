@@ -1,7 +1,8 @@
 from typing import List
 
 from parsing.commands import TuringCommand, MoveCommand, CommandEnum, ReadCommand, WriteCommand, JumpCommand, \
-    CondJumpCommand, CallCommand, HaltCommand, ValueCommand, EqualsComparison, ComparisonCommand
+    CondJumpCommand, CallCommand, HaltCommand, ValueCommand, EqualsComparison, ComparisonCommand, \
+    StackManipulationCommand
 from parsing.parser import AST
 from parsing.values import Value, Character, Boolean, Numeric
 from turing.machine import TuringMachine
@@ -80,6 +81,8 @@ class Commander:
                 for _ in range(c.nargs):
                     args.append(self.stack.pop(-1))
                 self.stack.append(Boolean(c.evaluate(args)))
+            elif isinstance(c, StackManipulationCommand):
+                c.execute(self.stack)
         self.command_buffer.clear()
         self.stack.clear()
         self.command_history.clear()

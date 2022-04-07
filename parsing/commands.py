@@ -15,6 +15,7 @@ class CommandEnum(Enum):
     COMPARE = 7
     VALUE = 8
     COND_JUMP = 9
+    STACK_MANIP = 10
 
 
 class TuringCommand:
@@ -129,3 +130,16 @@ class NegationComparison(ComparisonCommand):
 
     def evaluate(self, args: List[Value]) -> bool:
         return not args[0].value
+
+
+class StackManipulationCommand(TuringCommand):
+    def __init__(self):
+        super().__init__(CommandEnum.STACK_MANIP)
+
+    def execute(self, stack: List[Value]):
+        pass
+
+
+class DuplicateStackCommand(StackManipulationCommand):
+    def execute(self, stack: List[Value]):
+        stack.append(stack[-1])
