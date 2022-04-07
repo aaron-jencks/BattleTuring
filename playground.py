@@ -37,6 +37,8 @@ def display_tape(screen: pygame.display, tape: TheTape, machine: TuringMachine):
 
     screen.fill((255, 255, 255))
 
+    pointer = tape[machine]
+
     xstart = 0
     if len(tape) < window_size:
         # We can display the whole tape
@@ -52,6 +54,7 @@ def display_tape(screen: pygame.display, tape: TheTape, machine: TuringMachine):
             dtape = tape.memory[start:]
         else:
             dtape = tape.memory[start:end]
+        pointer -= start
 
     tape_start = int(y * 0.8)
     for ci, c in enumerate(dtape):
@@ -60,8 +63,8 @@ def display_tape(screen: pygame.display, tape: TheTape, machine: TuringMachine):
         screen.fill((0, 0, 0), (screen_index, tape_start, 10, 10))
         screen.blit(img, rect)
 
-    pointer = tape[machine]
-    img, rect = set_text('v', 11 * pointer + 5 + xstart, tape_start - 5, 10, (0, 0, 0))
+    pointer_x = 11 * pointer + 5 + xstart
+    img, rect = set_text('v', pointer_x, tape_start - 5, 10, (0, 0, 0))
     screen.blit(img, rect)
 
     pygame.display.update()
