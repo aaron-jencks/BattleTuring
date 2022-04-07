@@ -86,6 +86,8 @@ def main():
     """
 
     screen = pygame.display.set_mode((640, 480))
+    pygame.display.set_icon(pygame.image.load(pathlib.Path('./media/icon.png')))
+    pygame.display.set_caption('Battle Turing: Playground')
 
     tape = TheTape()
     machine = TuringMachine(tape)
