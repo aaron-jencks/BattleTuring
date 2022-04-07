@@ -17,6 +17,11 @@ python main.py
 python playground.py
 ```
 
+## Playground
+
+In [playground.py](playground.py) you can test your turing machine scripts, you can modify the initial tape, 
+as well as load different scripts from text files.
+
 ## The Language
 
 This program uses a simple scripting language to allow for easy implementation of turing machines, with some extensions.
@@ -56,6 +61,8 @@ left 20; # Move left 20 spaces
 ### Halting
 
 In light of the knowledge of the halting problem, there is a `halt` command that will terminate the current program.
+This is used instead of accept/reject states. If your machine halts, it's considered accepted, otherwise, 
+transition to a infinite while loop.
 
 ```
 halt;
