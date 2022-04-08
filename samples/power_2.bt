@@ -1,0 +1,83 @@
+accept:
+{
+    halt;
+}
+
+reject:
+{
+    while(true) {
+        right 1;
+    }
+}
+
+while(= ^ '.') { right 1; }
+
+if(= ^ 'a') {
+    write 'A';
+    right 1;
+}
+else {
+    goto reject;
+}
+
+if(= ^ '0') {
+    goto accept;
+}
+
+if(= ^ 'a') {
+    write 'B';
+    left 1;
+}
+else { goto reject; }
+
+shuffle:
+{
+    while(= ^ 'B') { left 1; }
+
+    if(= ^ 'A') {
+        write 'B';
+        left 1;
+    }
+    else { goto reject; }
+
+    if(= ^ '.') {
+        right 1;
+
+        while(= ^ 'B') {
+            write 'A';
+            right 1;
+        }
+
+        if(= read 'a') {
+            write 'B';
+            left 1;
+            goto shuffle;
+        }
+        else {
+            if(= read '0') {
+                goto accept;
+            }
+            else {
+                goto reject;
+            }
+        }
+    }
+    else {
+        if(= read 'A') {
+            right 1;
+
+            while(= read 'B') { right 1; }
+
+            if(= read 'a') {
+                write 'B';
+                left 1;
+                goto shuffle;
+            }
+            else {
+                goto reject;
+            }
+        }
+    }
+}
+
+goto shuffle;

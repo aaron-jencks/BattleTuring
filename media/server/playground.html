@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Battle Turing</title>
+    <style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-sizing;
+        max-width: 100%;
+    }
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: auto;
+        text-align: center;
+        display: block;
+    }
+    canvas#battleground {
+        width: 90%;
+        margin: auto;
+        height: 80%;
+        border: 1px solid #000000;
+        display: block;
+    }
+    div#controls {
+        width: 90%;
+        margin: auto;
+        border: 1px solid #000000;
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+<body>
+<canvas id="battleground"></canvas>
+<div id="controls">
+    <p>Hello World!</p>
+</div>
+<script>
+    socket = new WebSocket('ws://127.0.0.1:8765/');
+
+    socket.onopen= function() {
+        socket.send('hello');
+    };
+
+    socket.onmessage= function(s) {
+        alert('got reply ' + s.data);
+    };
+
+    (function() {
+      const canvas = document.getElementById('battleground');
+      const context = canvas.getContext('2d');
+
+      // resize the canvas to fill browser window dynamically
+      window.addEventListener('resize', resizeCanvas, false);
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        /**
+         * Your drawings need to be inside this function otherwise they will be reset when
+         * you resize the browser window and the canvas goes will be cleared.
+         */
+        drawStuff();
+      }
+
+      resizeCanvas();
+
+      function drawStuff() {
+        // do your drawing stuff here
+      }
+    })();
+</script>
+</body>
+</html>
