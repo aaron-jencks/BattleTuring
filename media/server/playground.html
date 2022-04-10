@@ -37,8 +37,8 @@
 <canvas id="battleground"></canvas>
 <div id="controls">
     <input type="button" value="Start" style="margin-top: 10px;" onclick="send_info();">
-    <input type="button" value="Stop">
-    <p>Box Size: <input id="size" type="number" value="20"></p>
+    <input type="button" value="Stop" onclick="halt_execution();">
+    <p>Box Size: <input id="size" type="number" value="20"> Simulation Speed (ms): <input id="speed" type="number" value="100"></p>
     <p style=" margin-top: 10px;">Initial String:<br><textarea id="initial_string" style="width: 90%;"></textarea></p>
     <p style=" margin-top: 10px;">Code:<br><textarea id="code" style="width: 90%; height: 400px;"></textarea></p>
 </div>
@@ -54,12 +54,15 @@
       return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
 
-    socket.onmessage = function(s) {
+    socket.onmessage = async function(s) {
         var jobj = JSON.parse(s.data);
         data.unshift(jobj);
         if(!rcv) {
+            console.log('Setting rcv to ' + !(jobj.last));
             rcv = !(jobj.last);
-            draw_loop();
+            if(rcv) {
+                await draw_loop();
+            }
         }
         else
             rcv = !(jobj.last);
@@ -136,7 +139,7 @@
                 context.fillStyle = "rgb(0, 0, 0, 1)";
                 context.fillRect(screen_index, tape_start, bsize, bsize);
                 context.fillStyle = "rgb(255, 255, 255, 1)";
-                context.fillText(value, screen_index + (bsize * 0.25), tape_start + (bsize * 0.75))
+                context.fillText(value, screen_index + (bsize >> 2), tape_start + (bsize * 0.75))
             }
         }
 
@@ -146,31 +149,44 @@
         context.font = (bsize >> 1) + "px couriernewbold";
 
         if(previous_data != null) {
-            pointer_x = (bsize + 1) * previous_data.tape.pointers[previous_data.identifier] + (bsize >> 1) + xstart;
+            pointer_x = (bsize + 1) * previous_data.tape.pointers[previous_data.identifier] + xstart;
             context.fillStyle = "rgb(255, 255, 255, 1)";
             context.clearRect(pointer_x, tape_start - bsize, bsize, bsize);
         }
 
-        pointer_x = (bsize + 1) * pointer + (bsize >> 1) + xstart;
+        pointer_x = (bsize + 1) * pointer + (bsize >> 2) + xstart;
         context.fillStyle = "rgb(0, 0, 0, 1)";
-        context.fillText('v', pointer_x, tape_start - (bsize >> 1));
+        context.fillText('v', pointer_x, tape_start - (bsize >> 2));
     }
 
     async function draw_loop() {
         while(rcv) {
+            try {
+                var delay = Number(document.getElementById('speed').value);
+                while(data.length > 0) {
+                    delay = Number(document.getElementById('speed').value);
+                    previous_data = current_data;
+                    current_data = data.pop();
+                    draw_battleground();
+                    await sleep(delay);
+                }
+            }
+            catch(err) {
+                console.log(err);
+            }
+            await sleep(delay);
+        }
+        try {
             while(data.length > 0) {
+                var delay = Number(document.getElementById('speed').value);
                 previous_data = current_data;
                 current_data = data.pop();
                 draw_battleground();
-                await sleep(100);
+                await sleep(delay);
             }
-            await sleep(100);
         }
-        while(data.length > 0) {
-            previous_data = current_data;
-            current_data = data.pop();
-            draw_battleground();
-            await sleep(100);
+        catch(err) {
+            console.log(err);
         }
         console.log("simulation done!");
     }
@@ -181,6 +197,18 @@
             code: document.getElementById('code').value
         };
         socket.send(JSON.stringify(data));
+    }
+
+    function halt_execution() {
+        console.log('Halting execution')
+        data.length = 0;
+        current_data = null;
+        previous_data = null;
+        rcv = false;
+        var jdata = {
+            stop: true
+        };
+        socket.send(JSON.stringify(jdata));
     }
 </script>
 </body>
