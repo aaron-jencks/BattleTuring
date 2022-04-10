@@ -45,6 +45,7 @@
     };
 
     socket.onmessage= function(s) {
+        var jobj = JSON.parse(s.data);
         alert('got reply ' + s.data);
     };
 
