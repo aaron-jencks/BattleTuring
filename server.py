@@ -31,30 +31,35 @@ halt;
 
 
 async def hello(websocket, path):
-    name = await websocket.recv()
-    jobj = json.loads(name)
-    print("< {}".format(name))
+    while True:
+        name = await websocket.recv()
+        jobj = json.loads(name)
+        print("< {}".format(name))
 
-    tape = TheTape()
-    machine = TuringMachine(tape)
+        tape = TheTape()
+        machine = TuringMachine(tape)
 
-    if 'initial_string' in jobj and len(jobj['initial_string']) > 0:
-        tape.initialize_tape(jobj['initial_string'])
+        if 'initial_string' in jobj and len(jobj['initial_string']) > 0:
+            tape.initialize_tape(jobj['initial_string'])
 
-    if 'code' in jobj and len(jobj['code']) > 0:
-        code = jobj['code']
-    else:
-        code = test
+        if 'code' in jobj and len(jobj['code']) > 0:
+            code = jobj['code']
+        else:
+            code = test
 
-    tape.reset(True)
+        tape.reset(True)
 
-    code = AST(Lexer(StringContainer(code)))
-    code.build_tree()
+        code = AST(Lexer(StringContainer(code)))
+        code.build_tree()
 
-    commander = Commander(code)
-    while commander.has_next():
-        commander.run_next(machine)
-        await websocket.send(json.dumps(machine.to_dict()))
+        commander = Commander(code)
+        while commander.has_next():
+            commander.run_next(machine)
+            jobj = machine.to_dict()
+            jobj['last'] = False
+            await websocket.send(json.dumps(jobj))
+        jobj['last'] = True
+        await websocket.send(json.dumps(jobj))
 
 
 if __name__ == '__main__':

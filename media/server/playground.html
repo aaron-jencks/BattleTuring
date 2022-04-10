@@ -38,15 +38,31 @@
 <div id="controls">
     <input type="button" value="Start" style="margin-top: 10px;" onclick="send_info();">
     <input type="button" value="Stop">
+    <p>Box Size: <input id="size" type="number" value="20"></p>
     <p style=" margin-top: 10px;">Initial String:<br><textarea id="initial_string" style="width: 90%;"></textarea></p>
     <p style=" margin-top: 10px;">Code:<br><textarea id="code" style="width: 90%; height: 400px;"></textarea></p>
 </div>
-<script>
+<script type="application/javascript" language="JavaScript">
     socket = new WebSocket('ws://127.0.0.1:8765/');
 
-    socket.onmessage= function(s) {
+    previous_data = null;
+    current_data = null;
+    data = []
+    rcv = false;
+
+    const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(resolve, milliseconds));
+    }
+
+    socket.onmessage = function(s) {
         var jobj = JSON.parse(s.data);
-        console.log(s.data);
+        data.unshift(jobj);
+        if(!rcv) {
+            rcv = !(jobj.last);
+            draw_loop();
+        }
+        else
+            rcv = !(jobj.last);
     };
 
     (function() {
@@ -73,6 +89,91 @@
         // do your drawing stuff here
       }
     })();
+
+    function draw_battleground() {
+        const canvas = document.getElementById('battleground');
+        const context = canvas.getContext('2d');
+
+        var bsize = Number(document.getElementById('size').value);
+
+        var x = canvas.width;
+        var y = canvas.height;
+        var window_size = Math.floor((x % (bsize + 1) > 0) ? (x / (bsize + 1)) : (x / (bsize + 1) - 1)); // how many blocks of the tape we can show
+
+        var pointer = current_data.tape.pointers[current_data.identifier];
+
+        var xstart = 0;
+        var dtape = null;
+        if(current_data.tape.memory.length < window_size) {
+            // We can display the whole tape
+            dtape = current_data.tape.memory;
+            xstart = (x - ((current_data.tape.memory.length * (bsize + 1)) + 1)) >> 1;
+        }
+        else {
+            // We need to display a window of the tape
+            var win_mid = window_size >> 1;
+            var start = (pointer < win_mid) ? 0 : (pointer - win_mid);
+            var dend = current_data.tape.memory.length - (pointer + 1);
+            var end = (dend < win_mid) ? -1 : (dend - win_mid + (win_mid % 2) + 1);
+
+            if(end < 0)
+                dtape = current_data.tape.memory.slice(start);
+            else
+                dtape = current_data.tape.memory.slice(start, end);
+
+            pointer -= start;
+        }
+
+        var tape_start = Math.floor(y * 0.8);
+
+        function display_block(value, index, array) {
+            if((previous_data != null && index < previous_data.tape.memory.length &&
+                previous_data.tape.memory[index] != value) ||
+                (previous_data == null || index >= previous_data.tape.memory.length)) {
+
+                var screen_index = ((bsize + 1) * index) + xstart;
+                context.font = (bsize >> 1) + "px courier monospace bold";
+                context.fillStyle = "rgb(0, 0, 0, 1)";
+                context.fillRect(screen_index, tape_start, bsize, bsize);
+                context.fillStyle = "rgb(255, 255, 255, 1)";
+                context.fillText(value, screen_index + (bsize * 0.25), tape_start + (bsize * 0.75))
+            }
+        }
+
+        dtape.forEach(display_block);
+
+        var pointer_x = 0;
+        context.font = (bsize >> 1) + "px couriernewbold";
+
+        if(previous_data != null) {
+            pointer_x = (bsize + 1) * previous_data.tape.pointers[previous_data.identifier] + (bsize >> 1) + xstart;
+            context.fillStyle = "rgb(255, 255, 255, 1)";
+            context.clearRect(pointer_x, tape_start - bsize, bsize, bsize);
+        }
+
+        pointer_x = (bsize + 1) * pointer + (bsize >> 1) + xstart;
+        context.fillStyle = "rgb(0, 0, 0, 1)";
+        context.fillText('v', pointer_x, tape_start - (bsize >> 1));
+    }
+
+    async function draw_loop() {
+        while(rcv) {
+            while(data.length > 0) {
+                previous_data = current_data;
+                current_data = data.pop();
+                draw_battleground();
+                await sleep(100);
+            }
+            await sleep(100);
+        }
+        while(data.length > 0) {
+            previous_data = current_data;
+            current_data = data.pop();
+            draw_battleground();
+            await sleep(100);
+        }
+        console.log("simulation done!");
+    }
 
     function send_info() {
         var data = {
