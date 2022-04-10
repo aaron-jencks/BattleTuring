@@ -14,4 +14,10 @@ class TuringMachine:
 
     def write(self, c: str):
         self.tape.write(self.ident, c)
+
+    def to_dict(self) -> dict:
+        return {
+            'identifier': self.ident,
+            'tape': self.tape.to_dict()
+        }
             

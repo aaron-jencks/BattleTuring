@@ -10,6 +10,13 @@ class TheTape:
         self.initial_string = ''
         self.reset()
 
+    def to_dict(self) -> dict:
+        return {
+            'memory': self.memory,
+            'pointers': self.pointers,
+            'alive': self.alive
+        }
+
     def __len__(self):
         return len(self.memory)
 

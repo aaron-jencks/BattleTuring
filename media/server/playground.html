@@ -28,6 +28,7 @@
         width: 90%;
         margin: auto;
         border: 1px solid #000000;
+        margin-top: 10px;
     }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -35,18 +36,17 @@
 <body>
 <canvas id="battleground"></canvas>
 <div id="controls">
-    <p>Hello World!</p>
+    <input type="button" value="Start" style="margin-top: 10px;" onclick="send_info();">
+    <input type="button" value="Stop">
+    <p style=" margin-top: 10px;">Initial String:<br><textarea id="initial_string" style="width: 90%;"></textarea></p>
+    <p style=" margin-top: 10px;">Code:<br><textarea id="code" style="width: 90%; height: 400px;"></textarea></p>
 </div>
 <script>
     socket = new WebSocket('ws://127.0.0.1:8765/');
 
-    socket.onopen= function() {
-        socket.send('hello');
-    };
-
     socket.onmessage= function(s) {
         var jobj = JSON.parse(s.data);
-        alert('got reply ' + s.data);
+        console.log(s.data);
     };
 
     (function() {
@@ -73,6 +73,14 @@
         // do your drawing stuff here
       }
     })();
+
+    function send_info() {
+        var data = {
+            initial_string: document.getElementById('initial_string').value,
+            code: document.getElementById('code').value
+        };
+        socket.send(JSON.stringify(data));
+    }
 </script>
 </body>
 </html>
