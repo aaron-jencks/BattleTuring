@@ -1,5 +1,5 @@
 from django.urls import path, include
-import views
+from battleground import views
 
 urlpatterns = [
     path('playground/', views.playground)
